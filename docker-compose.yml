@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+  dockerize-api:
+    image: sactio1811/dockerize
+    build:
+      context: .
+    ports:
+      - "29293:8080"
+    command: ["./main"]
+
+  curl-api:
+    image: byrnedo/alpine-curl
+    command: [ "dockerize-api:8080" ]

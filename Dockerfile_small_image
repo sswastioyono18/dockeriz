@@ -1,0 +1,22 @@
+# base image golang
+FROM golang:1.15.7-buster as build-env
+
+# set current workdir, this affect ADD COPY RUN and many docker command.
+# basically to not repeat /opt/dockerize/xxx path in the dockerfile
+WORKDIR /opt/dockerize
+ADD go.mod .
+ADD go.sum .
+# only add go.mod and go.sum and run go mod here so dependencies are cached
+RUN go mod download
+
+# copy all from project dir into workdir
+COPY . .
+# build
+RUN go build main.go
+# when docker run executed, run this command
+CMD ["./main"]
+
+FROM bitnami/minideb:latest
+WORKDIR /opt/dockerize
+COPY --from=build-env  /opt/dockerize/main .
+CMD ["./main"]
